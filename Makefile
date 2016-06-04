@@ -1,7 +1,10 @@
-SRCS=main.cs Cms/Net/Http/Server.cs Cms/Log/Logger.cs
+SRCS=main.cs \
+     Cms/Net/Http/Server.cs \
+     Cms/Log/Logger.cs \
+     Cms/View/Template.cs
 
 build:
-	mcs -reference:System.Net.Http -reference:System.Web $(SRCS)
+	mcs -r:System.Net.Http -r:System.Web -r:mustache-sharp.dll $(SRCS) 
 
 clean:
 	rm main.exe

@@ -9,11 +9,31 @@ class Program
 {
   public static void Main()
   {
+    var tmpl = new Cms.View.Template();
+    tmpl.LoadFromPath("./templates/");
+
+    Console.WriteLine(tmpl.Render("index.tmpl", "Bob"));
+
     var server = new Server(new Cms.Log.Console());
+    
+    var tc = new TestController();
+    
+    
     server.Handle("(?<name>[\\w]+).html$", new Website());
     server.Handle("assets/(?<file>.*)", new FileServer());
+    server.Handle("^/$", new HandlerFunc(tc.IndexPage));
     server.NotFound(new NotFound());
     server.ListenAndServe("http://localhost:8000/");
+  }
+}
+
+public class TestController
+{
+  public void IndexPage(HttpListenerResponse response, HttpListenerRequest request, IUrlParams urlParams)
+  {
+    throw new Exception("You fucked up");
+    var resp = new ResponseWriter(response);
+    resp.Redirect("/name/FoundHere");
   }
 }
 

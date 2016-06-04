@@ -9,6 +9,21 @@ using Cms.Log;
 
 namespace Cms.Net.Http
 {
+	public delegate void HandlerFuncCallback(HttpListenerResponse response, HttpListenerRequest request, IUrlParams urlParams); 
+	public class HandlerFunc : IHandler
+	{
+		HandlerFuncCallback func_;
+		public HandlerFunc(HandlerFuncCallback func)
+		{
+			func_ = func;
+		}
+
+		public void ServeHttp(HttpListenerResponse response, HttpListenerRequest request, IUrlParams urlParams)
+		{
+			func_(response, request, urlParams);
+		}
+	}
+
 	public interface IUrlParams
 	{
 		string Get(string key);
@@ -60,6 +75,17 @@ namespace Cms.Net.Http
 			response_ = response;
 		}
 
+		public void SetStatus(HttpStatusCode code)
+		{
+			response_.StatusCode = (int)code;
+		}
+
+		public void Redirect(string url)
+		{
+			response_.Redirect(url);
+			response_.Close();
+		}
+
 		public void WriteString(string content) 
 		{
 			byte[] buffer = System.Text.Encoding.UTF8.GetBytes(content);
@@ -72,6 +98,7 @@ namespace Cms.Net.Http
 			System.IO.Stream output = response_.OutputStream;
 			output.Write(content, 0, content.Length);
 			output.Close();
+			response_.Close();
 		}
 	}
 
@@ -105,30 +132,57 @@ namespace Cms.Net.Http
 
 			for(;;) {
 				HttpListenerContext context = listener.GetContext();
-
-				// FIXME(an): A threadpool would be probably better:
-				// Thread handler = new Thread(() => route(context));
-				// handler.Start();
 				Task.Run(() => route(context));
 			}
 		}
 
+		/*protected void routeX(HttpListenerContext context)
+		{
+			try
+			{
+				safeRoute(context);
+			}
+			catch(Exception e)
+			{
+				logger_.Error(string.Format("Exception: {0}", e.Message));
+			}
+		}*/
+
 		protected void route(HttpListenerContext context)
+		{
+			var handlerUrlParameterPair = findHandler(System.Web.HttpUtility.UrlDecode(context.Request.RawUrl));
+
+			if(handlerUrlParameterPair.Key != null) 
+			{
+				callHandler(handlerUrlParameterPair.Key, handlerUrlParameterPair.Value, context);
+				return;
+			}
+
+			notFoundHandler_.ServeHttp(context.Response, context.Request, new UrlParamsEmpty());
+		}
+
+		protected void callHandler(IHandler handler, IUrlParams urlParams, HttpListenerContext context)
 		{
 			HttpListenerRequest request = context.Request;
 			HttpListenerResponse response = context.Response;
 
-			var handlerUrlParameterPair = findHandler(System.Web.HttpUtility.UrlDecode(request.RawUrl));
+			logger_.Info(string.Format("{0} - {1} {2} - {3}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), 
+				                       request.HttpMethod, request.RawUrl, request.RemoteEndPoint.ToString()));
 
-			if(handlerUrlParameterPair.Key != null) {
-				logger_.Info(string.Format("{0} - {1} {2} - {3}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), 
-					                       request.HttpMethod, request.RawUrl, request.RemoteEndPoint.ToString()));
-				handlerUrlParameterPair.Key.ServeHttp(response, request, handlerUrlParameterPair.Value);
-				
-				return;
+			try
+			{
+				handler.ServeHttp(response, request, urlParams);
 			}
-
-			notFoundHandler_.ServeHttp(response, request, new UrlParamsEmpty());
+			catch(Exception e)
+			{
+				logger_.Error(string.Format("Exception: {0}", e.Message));
+			}
+			finally
+			{
+				// TODO(an): Add a configurable error handler here, 
+				// so we can show to the visitor that something went wrong.
+				response.Close();
+			}
 		}
 
 		protected KeyValuePair<IHandler, IUrlParams> findHandler(string url)
