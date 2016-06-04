@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 
 using Cms.Log;
@@ -106,8 +107,9 @@ namespace Cms.Net.Http
 				HttpListenerContext context = listener.GetContext();
 
 				// FIXME(an): A threadpool would be probably better:
-				Thread handler = new Thread(() => route(context));
-				handler.Start();
+				// Thread handler = new Thread(() => route(context));
+				// handler.Start();
+				Task.Run(() => route(context));
 			}
 		}
 

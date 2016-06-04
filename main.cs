@@ -46,7 +46,6 @@ public class FileServer : IHandler
         return;
       }
 
-
       resp.WriteString("<html><head><meta charset=\"UTF-8\"></head><body><h1>File "+urlParams.Get("file")+"</h1></body></html>");
     }
   }
