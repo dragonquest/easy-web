@@ -166,8 +166,8 @@ namespace Cms.Net.Http
 			HttpListenerRequest request = context.Request;
 			HttpListenerResponse response = context.Response;
 
-			logger_.Info(string.Format("{0} - {1} {2} - {3}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), 
-				                       request.HttpMethod, request.RawUrl, request.RemoteEndPoint.ToString()));
+			logger_.Info(string.Format("{0} - {1} - {2} {3}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), 
+				                       request.RemoteEndPoint.ToString(), request.HttpMethod, request.RawUrl));
 
 			try
 			{
