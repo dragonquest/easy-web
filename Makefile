@@ -15,5 +15,6 @@ runtest:
 
 clean:
 	rm main.exe
+	rm testmain.dll
 
 .PHONY: clean
