@@ -4,6 +4,8 @@ using System.Net;
 using System.Threading;
 using System.Text.RegularExpressions;
 
+using Cms.Log;
+
 namespace Cms.Net.Http
 {
 	public interface IUrlParams
@@ -76,10 +78,12 @@ namespace Cms.Net.Http
 	{
 		protected Dictionary<string, IHandler> handlers_;
 		protected IHandler notFoundHandler_;
+		protected ILogger logger_;
 
-		public Server()
+		public Server(ILogger logger)
 		{
 			handlers_ = new Dictionary<string, IHandler>();
+			logger_ = logger;
 		}
 
 		public void Handle(string url, IHandler handler)
@@ -115,7 +119,10 @@ namespace Cms.Net.Http
 			var handlerUrlParameterPair = findHandler(System.Web.HttpUtility.UrlDecode(request.RawUrl));
 
 			if(handlerUrlParameterPair.Key != null) {
+				logger_.Info(string.Format("{0} - {1} {2} - {3}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), 
+					                       request.HttpMethod, request.RawUrl, request.RemoteEndPoint.ToString()));
 				handlerUrlParameterPair.Key.ServeHttp(response, request, handlerUrlParameterPair.Value);
+				
 				return;
 			}
 
