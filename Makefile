@@ -5,7 +5,13 @@ SRCS=main.cs \
      AboutMe/Handler.cs
 
 build:
-	mcs -r:System.Net.Http -r:System.Web -r:mustache-sharp.dll $(SRCS) 
+	mcs -r:System.Net.Http -r:System.Web -r:System.Runtime.Serialization -r:mustache-sharp.dll $(SRCS) 
+
+test:
+	mcs -target:library -r:nunit.framework.dll testmain.cs
+
+runtest:
+	mono /Users/andi/Desktop/Backup/coding/csharp/days/03/bin/nunit3-console.exe testmain.dll --noresult --verbose --full
 
 clean:
 	rm main.exe
