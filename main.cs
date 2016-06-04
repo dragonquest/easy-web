@@ -28,20 +28,27 @@ public class Website : IHandler
 
 public class FileServer : IHandler
 {
+  static readonly object locker_ = new object();
+
   public void ServeHttp(HttpListenerResponse response, HttpListenerRequest request, IUrlParams urlParams)
   {
-    var fileName = urlParams.Get("file");
+    lock(locker_) {
+      var fileName = urlParams.Get("file");
 
-    var resp = new ResponseWriter(response);
-    if (File.Exists(fileName))
-    {
-      BinaryReader reader = new BinaryReader(File.Open(fileName, FileMode.Open));
-      byte[] allData = reader.ReadBytes(int.MaxValue);
-      resp.Write(allData);
-      return;
+      var resp = new ResponseWriter(response);
+
+      if (File.Exists(fileName))
+      {
+        BinaryReader reader = new BinaryReader(File.Open(fileName, FileMode.Open));
+        byte[] allData = reader.ReadBytes(int.MaxValue);
+        reader.Close();
+        resp.Write(allData);
+        return;
+      }
+
+
+      resp.WriteString("<html><head><meta charset=\"UTF-8\"></head><body><h1>File "+urlParams.Get("file")+"</h1></body></html>");
     }
-
-    resp.WriteString("<html><head><meta charset=\"UTF-8\"></head><body><h1>File "+urlParams.Get("file")+"</h1></body></html>");
   }
 }
 
