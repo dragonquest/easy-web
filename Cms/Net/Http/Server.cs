@@ -9,7 +9,7 @@ using Cms.Log;
 
 namespace Cms.Net.Http
 {
-	public delegate void HandlerFuncCallback(HttpListenerResponse response, HttpListenerRequest request, IUrlParams urlParams); 
+	public delegate void HandlerFuncCallback(HttpListenerResponse response, HttpListenerRequest request, IUrlParams urlParams);
 	public class HandlerFunc : IHandler
 	{
 		HandlerFuncCallback func_;
@@ -50,7 +50,7 @@ namespace Cms.Net.Http
 		{
 			params_.Add(key, val);
 		}
-		
+
 		public string Get(string key)
 		{
 			if(!params_.ContainsKey(key))
@@ -61,7 +61,7 @@ namespace Cms.Net.Http
 		}
 	}
 
-	public interface IHandler 
+	public interface IHandler
 	{
 		void ServeHttp(HttpListenerResponse response, HttpListenerRequest request, IUrlParams urlParams);
 	}
@@ -86,7 +86,7 @@ namespace Cms.Net.Http
 			response_.Close();
 		}
 
-		public void WriteString(string content) 
+		public void WriteString(string content)
 		{
 			byte[] buffer = System.Text.Encoding.UTF8.GetBytes(content);
 			Write(buffer);
@@ -152,7 +152,7 @@ namespace Cms.Net.Http
 		{
 			var handlerUrlParameterPair = findHandler(System.Web.HttpUtility.UrlDecode(context.Request.RawUrl));
 
-			if(handlerUrlParameterPair.Key != null) 
+			if(handlerUrlParameterPair.Key != null)
 			{
 				callHandler(handlerUrlParameterPair.Key, handlerUrlParameterPair.Value, context);
 				return;
@@ -166,7 +166,7 @@ namespace Cms.Net.Http
 			HttpListenerRequest request = context.Request;
 			HttpListenerResponse response = context.Response;
 
-			logger_.Info(string.Format("{0} - {1} - {2} {3}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), 
+			logger_.Info(string.Format("{0} - {1} - {2} {3}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
 				                       request.RemoteEndPoint.ToString(), request.HttpMethod, request.RawUrl));
 
 			try
@@ -179,7 +179,7 @@ namespace Cms.Net.Http
 			}
 			finally
 			{
-				// TODO(an): Add a configurable error handler here, 
+				// TODO(an): Add a configurable error handler here,
 				// so we can show to the visitor that something went wrong.
 				response.Close();
 			}
@@ -201,7 +201,7 @@ namespace Cms.Net.Http
 			    {
 			    	var parameters = new UrlParamsBag();
 
-			    	// Accessing regex here again feels a bit hackish but 
+			    	// Accessing regex here again feels a bit hackish but
 			    	// based on https://msdn.microsoft.com/en-us/library/6h453d2h(v=vs.110).aspx
 			    	// the regex should be thread-safe:
 				    foreach(string key in regex.GetGroupNames())
