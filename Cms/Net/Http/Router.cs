@@ -16,12 +16,17 @@ namespace Cms.Net.Http
         public bool IsMatch;
         public IRoute Route;
         public UrlParamsBag Params;
+
+        // If Stop is set to true then the matched
+        // route should be returned and the segments
+        // should not be walked further.
+        public bool Stop;
     }
 
     interface IRoute
     {
-        string GetData();
-        bool SetData(string data);
+        IHandler GetData();
+        bool SetData(IHandler data);
 
         RouteMatch TryMatch(string key);
 
@@ -32,53 +37,9 @@ namespace Cms.Net.Http
         string Dump(int level = 0);
     }
 
-    class RouteNotFound : IRoute
-    {
-        public RouteNotFound()
-        {
-        }
-
-        public string GetData()
-        {
-            return "";
-        }
-
-        public bool SetData(string data)
-        {
-            return false;
-        }
-
-        public bool HasChild(string key)
-        {
-            return false;
-        }
-
-        public RouteMatch TryMatch(string key)
-        {
-            var r = new RouteMatch();
-            r.IsMatch = false;
-            return r;
-        }
-
-        public IRoute GetChild(string key)
-        {
-            return new RouteNotFound();
-        }
-
-        public bool AddChild(string key, IRoute route)
-        {
-            return false;
-        }
-
-        public string Dump(int level = 0)
-        {
-            return "";
-        }
-    }
-
     class StaticRoute : IRoute, IRouteCreator
     {
-        protected string data_;
+        protected IHandler handler_;
         protected Dictionary<string, IRoute> children_;
 
         public StaticRoute()
@@ -91,14 +52,14 @@ namespace Cms.Net.Http
             return new StaticRoute();
         }
 
-        public string GetData()
+        public IHandler GetData()
         {
-            return data_;
+            return handler_;
         }
 
-        public bool SetData(string data)
+        public bool SetData(IHandler handler)
         {
-            data_ = data;
+            handler_ = handler;
             return true;
         }
 
@@ -110,7 +71,7 @@ namespace Cms.Net.Http
         public RouteMatch TryMatch(string key)
         {
             var res = new RouteMatch();
-
+            res.Stop = false;
             res.IsMatch = children_.ContainsKey(key);
             if (res.IsMatch)
             {
@@ -139,7 +100,7 @@ namespace Cms.Net.Http
                 padding += " ";
             }
             string pretty = "";
-            pretty += padding + "[data="+data_+"]";
+            pretty += padding + "[data="+handler_+"]";
             pretty += "\n";
 
             foreach (var item in children_)
@@ -155,7 +116,7 @@ namespace Cms.Net.Http
 
     class RegexRoute : IRoute, IRouteCreator
     {
-        protected string data_;
+        protected IHandler handler_;
         protected Dictionary<string, IRoute> children_;
 		protected Dictionary<string, IRoute> regexChildren_;
 		protected ConcurrentDictionary<string, Regex> regexes_;
@@ -172,14 +133,14 @@ namespace Cms.Net.Http
             return new RegexRoute();
         }
 
-        public string GetData()
+        public IHandler GetData()
         {
-            return data_;
+            return handler_;
         }
 
-        public bool SetData(string data)
+        public bool SetData(IHandler handler)
         {
-            data_ = data;
+            handler_ = handler;
             return true;
         }
 
@@ -194,6 +155,7 @@ namespace Cms.Net.Http
             var res = new RouteMatch();
 
             res.IsMatch = false;
+            res.Stop = false;
 
             // If the route is not a regex and can be
             // found then we just go grab that route
@@ -222,6 +184,11 @@ namespace Cms.Net.Http
                 var match = regex.Match(key);
                 if (match.Success)
                 {
+                    if (child.Key.LastIndexOf('$') >= 0)
+                    {
+                        res.Stop = true;
+                    }
+
                     res.IsMatch = true;
                     res.Route = child.Value;
                     res.Params = new UrlParamsBag();
@@ -248,7 +215,7 @@ namespace Cms.Net.Http
 
         public bool AddChild(string key, IRoute route)
         {
-			if (key.IndexOf('(') > 0)
+			if (key.IndexOf('(') >= 0 && key.IndexOf(')') >= 0)
 			{
 				regexChildren_[key] = route;
 				return true;
@@ -266,7 +233,7 @@ namespace Cms.Net.Http
                 padding += " ";
             }
             string pretty = "";
-            pretty += padding + "[data="+data_+"]";
+            pretty += padding + "[data="+handler_+"]";
             pretty += "\n";
 
             foreach (var item in children_)
@@ -340,34 +307,34 @@ namespace Cms.Net.Http
             root_ = routeCreator.Create();
         }
 
-        public void Add(string url, string data)
+        public void Add(string url, IHandler handler)
         {
             string[] segments = segmenter_.Split(url);
 
-            add(ref root_, segments, data);
+            add(ref root_, segments, handler);
         }
 
-        private void add(ref IRoute route, string[] segments, string data)
+        private void add(ref IRoute route, string[] segments, IHandler handler)
         {
             if (segments.Length == 0)
             {
-                route.SetData(data);
+                route.SetData(handler);
                 return;
             }
 
             if (!route.HasChild(segments[0]))
             {
                 IRoute newRoute = routeCreator_.Create();
-                newRoute.SetData(data);
+                newRoute.SetData(handler);
                 route.AddChild(segments[0], newRoute);
             }
 
             var nextRoute = route.GetChild(segments[0]);
-            add(ref nextRoute, pop(1, segments), data);
+            add(ref nextRoute, pop(1, segments), handler);
             return;
         }
 
-        public KeyValuePair<IRoute, UrlParamsBag> Lookup(string url)
+        public KeyValuePair<IHandler, UrlParamsBag> Lookup(string url)
         {
             var parameters = new UrlParamsBag();
             string[] segments = segmenter_.Split(url);
@@ -375,25 +342,25 @@ namespace Cms.Net.Http
             return lookup(ref root_, segments, ref parameters);
         }
 
-        private KeyValuePair<IRoute, UrlParamsBag> lookup(ref IRoute route, string[] segments, ref UrlParamsBag parameters)
+        private KeyValuePair<IHandler, UrlParamsBag> lookup(ref IRoute route, string[] segments, ref UrlParamsBag parameters)
         {
             if (segments.Length == 0)
             {
-                return new KeyValuePair<IRoute, UrlParamsBag>(new RouteNotFound(), parameters);
+                return new KeyValuePair<IHandler, UrlParamsBag>(null, parameters);
             }
 
             RouteMatch m = route.TryMatch(segments[0]);
 
             if (!m.IsMatch)
             {
-                return new KeyValuePair<IRoute, UrlParamsBag>(new RouteNotFound(), parameters);
+                return new KeyValuePair<IHandler, UrlParamsBag>(null, parameters);
             }
 
             parameters.Merge(ref m.Params);
 
-            if (segments.Length == 1)
+            if (segments.Length == 1 || m.Stop)
             {
-                return new KeyValuePair<IRoute, UrlParamsBag>(m.Route, parameters);
+                return new KeyValuePair<IHandler, UrlParamsBag>(m.Route.GetData(), parameters);
             }
 
             var nextRoute = m.Route;

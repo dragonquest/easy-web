@@ -25,9 +25,9 @@ class Program
 
     var websiteCtrl = new AboutMe.Handler.WebsiteController(tmpl);
 
-    httpServer.Handle("(?<name>[\\w]+).html$", new AboutMe.Handler.Website());
-    httpServer.Handle("assets/(?<file>.*)", new AboutMe.Handler.AssetsHandler(config.AssetsBaseDir));
-    httpServer.Handle("^/$", new HandlerFunc(websiteCtrl.IndexPage));
+    httpServer.Handle("/(?<name>[\\w]+).html$", new AboutMe.Handler.Website());
+    httpServer.Handle("/assets/(?<file>.*)$", new AboutMe.Handler.AssetsHandler(config.AssetsBaseDir));
+    httpServer.Handle("/", new HandlerFunc(websiteCtrl.IndexPage));
     httpServer.NotFound(new AboutMe.Handler.NotFound());
     httpServer.ListenAndServe(config.BindAddress);
   }

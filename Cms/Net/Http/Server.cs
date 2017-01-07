@@ -12,19 +12,19 @@ namespace Cms.Net.Http
 {
 	class Server
 	{
-		protected Dictionary<string, IHandler> handlers_;
+		protected Router router_;
 		protected IHandler notFoundHandler_;
 		protected ILogger logger_;
 
 		public Server(ILogger logger)
 		{
-			handlers_ = new Dictionary<string, IHandler>();
-			logger_ = logger;
+			router_ = new Router(new RegexRoute(), new DelimiterSegmenter('/'));
+            logger_ = logger;
 		}
 
 		public void Handle(string url, IHandler handler)
 		{
-			handlers_.Add(url, handler);
+			router_.Add(url, handler);
 		}
 
 		public void NotFound(IHandler notFoundHandler)
@@ -44,18 +44,19 @@ namespace Cms.Net.Http
 			}
 		}
 
-		protected void route(HttpListenerContext context)
-		{
-			var handlerUrlParameterPair = findHandler(System.Web.HttpUtility.UrlDecode(context.Request.RawUrl));
+        protected void route(HttpListenerContext context)
+        {
+            var handlerWithParameters = router_.Lookup(System.Web.HttpUtility.UrlDecode(context.Request.Url.AbsolutePath));
 
-			if(handlerUrlParameterPair.Key != null)
-			{
-				callHandler(handlerUrlParameterPair.Key, handlerUrlParameterPair.Value, context);
-				return;
-			}
+            if (handlerWithParameters.Key == null)
+            {
+			    notFoundHandler_.ServeHttp(new ResponseWriter(context.Response), context.Request, new UrlParamsEmpty());
+                return;
+            }
 
-			notFoundHandler_.ServeHttp(context.Response, context.Request, new UrlParamsEmpty());
-		}
+            callHandler(handlerWithParameters.Key, handlerWithParameters.Value, context);
+            return;
+        }
 
 		protected void callHandler(IHandler handler, IUrlParams urlParams, HttpListenerContext context)
 		{
@@ -67,7 +68,7 @@ namespace Cms.Net.Http
 
 			try
 			{
-				handler.ServeHttp(response, request, urlParams);
+				handler.ServeHttp(new ResponseWriter(response), request, urlParams);
 			}
 			catch(Exception e)
 			{
@@ -81,7 +82,7 @@ namespace Cms.Net.Http
 			}
 		}
 
-		protected KeyValuePair<IHandler, IUrlParams> findHandler(string url)
+/*		protected KeyValuePair<IHandler, IUrlParams> findHandler(string url)
 		{
 			// Iterating through each handler to check if a handler matches
 			// is potentially slow but for this demo it is good enough.
@@ -110,5 +111,6 @@ namespace Cms.Net.Http
 
 			return new KeyValuePair<IHandler, IUrlParams>(null, null);
 		}
+*/
 	}
 }
