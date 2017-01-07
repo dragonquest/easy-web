@@ -2,8 +2,10 @@ SRCS=main.cs \
      Cms/Net/Http/Server.cs \
      Cms/Net/Http/Router.cs \
      Cms/Net/Http/UrlParams.cs \
+     Cms/Net/Http/Request.cs \
      Cms/Net/Http/ResponseWriter.cs \
      Cms/Net/Http/Handler.cs \
+     Cms/Net/Http/Handler/StripPrefix.cs \
      Cms/Log/Logger.cs \
      Cms/View/Template.cs \
      AboutMe/Handler.cs

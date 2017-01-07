@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 
 using Cms.Net.Http;
+using Cms.Net.Http.Handler;
 
 class Program
 {
@@ -26,7 +27,7 @@ class Program
     var websiteCtrl = new AboutMe.Handler.WebsiteController(tmpl);
 
     httpServer.Handle("/(?<name>[\\w]+).html$", new AboutMe.Handler.Website());
-    httpServer.Handle("/assets/(?<file>.*)$", new AboutMe.Handler.AssetsHandler(config.AssetsBaseDir));
+    httpServer.Handle("/assets/(?<file>.*)$", new StripPrefix("/assets/", new AboutMe.Handler.AssetsHandler(config.AssetsBaseDir)));
     httpServer.Handle("/", new HandlerFunc(websiteCtrl.IndexPage));
     httpServer.NotFound(new AboutMe.Handler.NotFound());
     httpServer.ListenAndServe(config.BindAddress);

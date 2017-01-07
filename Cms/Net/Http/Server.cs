@@ -50,7 +50,7 @@ namespace Cms.Net.Http
 
             if (handlerWithParameters.Key == null)
             {
-			    notFoundHandler_.ServeHttp(new ResponseWriter(context.Response), context.Request, new UrlParamsEmpty());
+                callHandler(notFoundHandler_, new UrlParamsEmpty(), context);
                 return;
             }
 
@@ -68,7 +68,7 @@ namespace Cms.Net.Http
 
 			try
 			{
-				handler.ServeHttp(new ResponseWriter(response), request, urlParams);
+				handler.ServeHttp(new ResponseWriter(response), new Request(request), urlParams);
 			}
 			catch(Exception e)
 			{

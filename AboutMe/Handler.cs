@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using System.IO;
 
@@ -13,7 +14,7 @@ namespace AboutMe.Handler {
       template_ = template;
     }
 
-    public void IndexPage(IResponseWriter response, HttpListenerRequest request, IUrlParams urlParams)
+    public void IndexPage(IResponseWriter response, IRequest request, IUrlParams urlParams)
     {
       response.WriteString(template_.Render("index.tmpl", null));
     }
@@ -21,7 +22,7 @@ namespace AboutMe.Handler {
 
   public class Website : IHandler
   {
-    public void ServeHttp(IResponseWriter response, HttpListenerRequest request, IUrlParams urlParams)
+    public void ServeHttp(IResponseWriter response, IRequest request, IUrlParams urlParams)
     {
       response.WriteString("<html><head><meta charset=\"UTF-8\"></head><body><h1>Hello "+urlParams.Get("name")+"</h1></body></html>");
     }
@@ -37,10 +38,10 @@ namespace AboutMe.Handler {
       assetsDir_ = assetsDir;
     }
 
-    public void ServeHttp(IResponseWriter response, HttpListenerRequest request, IUrlParams urlParams)
+    public void ServeHttp(IResponseWriter response, IRequest request, IUrlParams urlParams)
     {
       lock(locker_) {
-        string fileName = "." + request.Url.AbsolutePath;
+        string fileName = assetsDir_ + request.Url.AbsolutePath;
         response.Headers().Set("Cache-Control", "max-age=2592000"); // 30 days default
 
         if (File.Exists(fileName))
@@ -59,7 +60,7 @@ namespace AboutMe.Handler {
 
   public class NotFound : IHandler
   {
-    public void ServeHttp(IResponseWriter response, HttpListenerRequest request, IUrlParams urlParams)
+    public void ServeHttp(IResponseWriter response, IRequest request, IUrlParams urlParams)
     {
       response.WriteString("<html><body><h1>Website not found</h1></body></html>");
     }

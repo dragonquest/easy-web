@@ -5,11 +5,11 @@ namespace Cms.Net.Http
 {
 	public interface IHandler
 	{
-		void ServeHttp(IResponseWriter response, HttpListenerRequest request, IUrlParams urlParams);
+		void ServeHttp(IResponseWriter response, IRequest request, IUrlParams urlParams);
 	}
 
-	public delegate void HandlerFuncCallback(IResponseWriter response, HttpListenerRequest request, IUrlParams urlParams);
-	
+	public delegate void HandlerFuncCallback(IResponseWriter response, IRequest request, IUrlParams urlParams);
+
 	public class HandlerFunc : IHandler
 	{
 		HandlerFuncCallback func_;
@@ -18,7 +18,7 @@ namespace Cms.Net.Http
 			func_ = func;
 		}
 
-		public void ServeHttp(IResponseWriter response, HttpListenerRequest request, IUrlParams urlParams)
+		public void ServeHttp(IResponseWriter response, IRequest request, IUrlParams urlParams)
 		{
 			func_(response, request, urlParams);
 		}
