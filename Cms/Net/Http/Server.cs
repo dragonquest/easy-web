@@ -1,107 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+
+using System.Net;
 
 using Cms.Log;
 
 namespace Cms.Net.Http
 {
-	public delegate void HandlerFuncCallback(HttpListenerResponse response, HttpListenerRequest request, IUrlParams urlParams);
-	public class HandlerFunc : IHandler
-	{
-		HandlerFuncCallback func_;
-		public HandlerFunc(HandlerFuncCallback func)
-		{
-			func_ = func;
-		}
-
-		public void ServeHttp(HttpListenerResponse response, HttpListenerRequest request, IUrlParams urlParams)
-		{
-			func_(response, request, urlParams);
-		}
-	}
-
-	public interface IUrlParams
-	{
-		string Get(string key);
-	}
-
-	class UrlParamsEmpty : IUrlParams
-	{
-		public string Get(string key)
-		{
-			return "";
-		}
-	}
-
-	class UrlParamsBag : IUrlParams
-	{
-		protected Dictionary<string, string> params_;
-
-		public UrlParamsBag()
-		{
-			params_ = new Dictionary<string, string>();
-		}
-
-		public void Add(string key, string val)
-		{
-			params_.Add(key, val);
-		}
-
-		public string Get(string key)
-		{
-			if(!params_.ContainsKey(key))
-			{
-				return "";
-			}
-			return params_[key];
-		}
-	}
-
-	public interface IHandler
-	{
-		void ServeHttp(HttpListenerResponse response, HttpListenerRequest request, IUrlParams urlParams);
-	}
-
-	class ResponseWriter
-	{
-		HttpListenerResponse response_;
-
-		public ResponseWriter(HttpListenerResponse response)
-		{
-			response_ = response;
-		}
-
-		public void SetStatus(HttpStatusCode code)
-		{
-			response_.StatusCode = (int)code;
-		}
-
-		public void Redirect(string url)
-		{
-			response_.Redirect(url);
-			response_.Close();
-		}
-
-		public void WriteString(string content)
-		{
-			byte[] buffer = System.Text.Encoding.UTF8.GetBytes(content);
-			Write(buffer);
-		}
-
-		public void Write(byte[] content)
-		{
-			response_.ContentLength64 = content.Length;
-			System.IO.Stream output = response_.OutputStream;
-			output.Write(content, 0, content.Length);
-			output.Close();
-			response_.Close();
-		}
-	}
-
 	class Server
 	{
 		protected Dictionary<string, IHandler> handlers_;
@@ -135,18 +43,6 @@ namespace Cms.Net.Http
 				Task.Run(() => route(context));
 			}
 		}
-
-		/*protected void routeX(HttpListenerContext context)
-		{
-			try
-			{
-				safeRoute(context);
-			}
-			catch(Exception e)
-			{
-				logger_.Error(string.Format("Exception: {0}", e.Message));
-			}
-		}*/
 
 		protected void route(HttpListenerContext context)
 		{
