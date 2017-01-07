@@ -1,5 +1,6 @@
 SRCS=main.cs \
      Cms/Net/Http/Server.cs \
+     Cms/Net/Http/Router.cs \
      Cms/Net/Http/UrlParams.cs \
      Cms/Net/Http/ResponseWriter.cs \
      Cms/Net/Http/Handler.cs \

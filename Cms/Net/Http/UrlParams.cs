@@ -30,6 +30,17 @@ namespace Cms.Net.Http
 			params_.Add(key, val);
 		}
 
+        public bool Merge(ref UrlParamsBag other)
+        {
+            if (other == null) return true;
+
+            foreach (KeyValuePair<string, string> pair in other.Raw())
+            {
+                params_[pair.Key] = pair.Value;
+            }
+            return true;
+        }
+
 		public string Get(string key)
 		{
 			if(!params_.ContainsKey(key))
@@ -38,5 +49,15 @@ namespace Cms.Net.Http
 			}
 			return params_[key];
 		}
+
+        public int Count()
+        {
+            return params_.Count;
+        }
+
+        public Dictionary<string, string> Raw()
+        {
+            return params_;
+        }
 	}
 }
