@@ -66,6 +66,7 @@ namespace Cms.Net.Http
 			logger_.Info(string.Format("{0} - {1} - {2} {3}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
 				                       request.RemoteEndPoint.ToString(), request.HttpMethod, request.RawUrl));
 
+
 			try
 			{
 				handler.ServeHttp(new ResponseWriter(response), new Request(request), urlParams);
@@ -76,41 +77,8 @@ namespace Cms.Net.Http
 			}
 			finally
 			{
-				// TODO(an): Add a configurable error handler here,
-				// so we can show to the visitor that something went wrong.
 				response.Close();
 			}
 		}
-
-/*		protected KeyValuePair<IHandler, IUrlParams> findHandler(string url)
-		{
-			// Iterating through each handler to check if a handler matches
-			// is potentially slow but for this demo it is good enough.
-			// If there are any performance issue we can optimize it after profiling.
-
-			// TODO(an): Also check if accessing handlers_ is threadsafe or not.
-			foreach(var handler in handlers_)
-			{
-			    Regex regex = new Regex(handler.Key);
-			    var match = regex.Match(url);
-
-			    if(match.Success)
-			    {
-			    	var parameters = new UrlParamsBag();
-
-			    	// Accessing regex here again feels a bit hackish but
-			    	// based on https://msdn.microsoft.com/en-us/library/6h453d2h(v=vs.110).aspx
-			    	// the regex should be thread-safe:
-				    foreach(string key in regex.GetGroupNames())
-				    {
-				    	parameters.Add(key.ToString(), match.Groups[key].Value);
-				    }
-			    	return new KeyValuePair<IHandler,IUrlParams>(handler.Value, parameters);
-			    }
-			}
-
-			return new KeyValuePair<IHandler, IUrlParams>(null, null);
-		}
-*/
 	}
 }

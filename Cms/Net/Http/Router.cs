@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using System.Runtime.CompilerServices;
+using System.Linq;
 
 namespace Cms.Net.Http
 {
@@ -261,16 +262,25 @@ namespace Cms.Net.Http
         private Dictionary<string, string[]> cache_;
         private ISegmenter segmenter_;
 
-        public CachedSegmenter(ISegmenter segmenter)
+        private int size_;
+        
+        public CachedSegmenter(ISegmenter segmenter, int size = 5000)
         {
             cache_ = new Dictionary<string, string[]>();
             segmenter_ = segmenter;
+            size_ = size;
         }
 
         public string[] Split(string url)
         {
             if(!cache_.ContainsKey(url))
             {
+                if (cache_.Count >= size_) {
+                    Random rand = new Random();
+                    var itemKey = cache_.Keys.ToList()[rand.Next(0, cache_.Count)];
+                    cache_.Remove(itemKey);
+                }
+
                 var parsed = segmenter_.Split(url);
                 cache_[url] = parsed;
                 return parsed;
@@ -350,7 +360,6 @@ namespace Cms.Net.Http
             }
 
             RouteMatch m = route.TryMatch(segments[0]);
-
             if (!m.IsMatch)
             {
                 return new KeyValuePair<IHandler, UrlParamsBag>(null, parameters);
@@ -371,7 +380,7 @@ namespace Cms.Net.Http
         private string[] pop(int n, string[] values)
         {
             var popped = new string[values.Length - n];
-            int ptr=0;
+            int ptr = 0;
             for(int i = n; i < values.Length; i++)
             {
                 popped[ptr++] = values[i];
