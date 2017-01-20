@@ -1,13 +1,10 @@
 SRCS = $(shell find . -name '*.cs' -and -not -name '*test*')
 
 build:
-	mcs -o- -debug -r:System.Net.Http -r:System.Web -r:System.Runtime.Serialization -r:mustache-sharp.dll $(SRCS) 
-
-lock:
-	mcs /out:lock.exe -o- -debug Cms/Benchmark/Benchmark.cs Cms/Benchmark/Experiment.cs fcklock.cs
+	mcs /out:main.exe -o- -debug -r:System.Net.Http -r:System.Web -r:System.Runtime.Serialization -r:mustache-sharp.dll $(SRCS) 
 
 prod:
-	mcs -o+ -r:System.Net.Http -r:System.Web -r:System.Runtime.Serialization -r:mustache-sharp.dll $(SRCS) 
+	mcs /out:main.exe -o+ -r:System.Net.Http -r:System.Web -r:System.Runtime.Serialization -r:mustache-sharp.dll $(SRCS) 
 
 test:
 	mcs -target:library -r:nunit.framework.dll testmain.cs

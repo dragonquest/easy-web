@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Cms.Benchmark
 {
@@ -27,9 +28,9 @@ namespace Cms.Benchmark
             _list.Add(entry);
         }
 
-        public List<ReportEntry> Run(int num)
+        public List<Measurement> Run(int num)
         {
-            var report = new List<ReportEntry>();
+            var report = new List<Measurement>();
 
             foreach (var entry in _list)
             {
@@ -38,100 +39,123 @@ namespace Cms.Benchmark
             return report;
         }
 
-        public ReportEntry RunAction(int num, string name, Action action)
+        public Measurement RunAction(int num, string name, Action action)
         {
-            var allocBytes = GetMemoryBytes();
-            var handleCount = GetHandleCount();
+            var results = new Measurement();
 
+            results.Name = name;
             var timer = new Stopwatch();
             for (int i = 0; i < num; i++)
             {
+                timer.Reset();
                 timer.Start();
                 action.Invoke();
                 timer.Stop();
+
+                results.Values.Add(timer.Elapsed.TotalMilliseconds);
             }
-            var allocBytesEnd = GetMemoryBytes();
-            var handleCountEnd = GetHandleCount();
 
-            var reportEntry = new ReportEntry
-            {
-                Name = name,
-                Average = ((decimal)timer.Elapsed.TotalMilliseconds) / (decimal)num,
-
-                AllocBytes = (allocBytesEnd - allocBytes) / (decimal)num,
-                HandleCount = (handleCountEnd - handleCount) / num,
-
-                Iterations = num,
-            };
-
-            return reportEntry;
+            return results;
         }
+    }
 
-        public class ReportEntry
+    public class Measurement
+    {
+        public string Name { get; set; }
+        public List<double> Values { get; set; }
+
+        public Measurement()
         {
-            public string Name { get; set; }
-            public decimal Average { get; set; }
+            Values = new List<double>();
+        }
 
-			public decimal AllocBytes { get; set; }
-			public int HandleCount { get; set; }
-
-			public int Iterations { get; set; }
-
-            public void Merge(List<ReportEntry> others)
-            {
-                for(int i = 0; i < others.Count; i++)
-                {
-                    if(Name != others[i].Name) continue;
-
-                    Average = (Average + others[i].Average) / (decimal)2.0;
-                    AllocBytes = (AllocBytes + others[i].AllocBytes) / (decimal)2.0;
-                    HandleCount = (HandleCount + others[i].HandleCount) / 2;
-                    Iterations += others[i].Iterations;
-                }
+        public int Count {
+            get {
+                return Values.Count;
             }
         }
 
-		public decimal GetMemoryBytes()
-		{
-			GC.Collect();
-			GC.WaitForPendingFinalizers();
-			return (decimal)GC.GetTotalMemory(true);
-		}
+        public void Merge(Measurement other)
+        {
+            if (Name != other.Name)
+            {
+                return;
+            }
 
-		public int GetHandleCount()
-		{
-			return System.Diagnostics.Process.GetCurrentProcess().HandleCount;
-		}
+            foreach (var entry in other.Values)
+            {
+                Values.Add(entry);
+            }
+        }
+
+        public void MergeList(List<Measurement> other)
+        {
+            foreach(var measurement in other)
+            {
+                Merge(measurement);
+            }
+        }
+    }
+
+    public class Statistics
+    {
+        public double Average(Measurement m)
+        {
+            double res = 0;
+            foreach(var val in m.Values)
+            {
+                res += val;
+            }
+            return res / (double) m.Count;
+        }
+
+        public double Median(Measurement m)
+        {
+            var sorted = m.Values.OrderBy(x => x).ToArray();
+            int mid = sorted.Length / 2;
+
+            if (sorted.Length % 2 == 0)
+                return (sorted[mid] + sorted[mid -1]) / 2;
+
+            return sorted[mid];
+        }
     }
 
     public class SimpleConsolePrinter
     {
-        public void Print(List<Runner.ReportEntry> entries)
+        public Dictionary<string, Measurement> GroupByName(List<Measurement> measurements)
         {
-            if (entries.Count < 1)
+            var result = new Dictionary<string, Measurement>();
+
+            foreach(var m in measurements)
             {
-                Console.Write("Error: At least one ReportEntry is needed.");
-                return;
+                if (!result.ContainsKey(m.Name))
+                {
+                    result[m.Name] = m;
+                    continue;
+                }
+
+                foreach (var val in m.Values)
+                {
+                    result[m.Name].Values.Add(val);
+                }
             }
 
-            decimal totalMs = 0;
-            foreach (var entry in entries)
-            {
-                totalMs += entry.Average;
-            }
+            return result;
+        }
 
-            Console.WriteLine(" ");
-            Console.WriteLine("{0} Iterations: ", entries[0].Iterations);
-            Console.WriteLine("{0}", new String('*', 80));
-            foreach (var entry in entries)
+        public void Print(List<Measurement> measurements)
+        {
+            var stats = new Statistics();
+            var grouped = GroupByName(measurements);
+
+            Console.WriteLine("Iters\t\tAvg\t\t\tMedian\t\t\t\tName");
+            foreach (var entry in grouped)
             {
-                decimal perc = (100.0m / totalMs) * entry.Average;
-				var allocBytes = entry.AllocBytes;
-				if (allocBytes <= 0) 
-				{
-					allocBytes = 0;
-				}
-                Console.WriteLine("{0:00.00000} ms/avg\t\t{1:00.00} %\t\t{2:0000.000.000} bytes\t\t{3}", entry.Average, perc, allocBytes, entry.Name);
+                var iters = entry.Value.Values.Count;
+                var avg = stats.Average(entry.Value);
+                var median = stats.Median(entry.Value);
+                Console.WriteLine("{0:0000}\t\t{1:00.00000} ms/avg\t\t{2:00.00000} ms/median\t\t{3}", iters, avg, median, entry.Key);
             }
             Console.WriteLine(" ");
         }

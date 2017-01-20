@@ -53,6 +53,22 @@ namespace Cms.Net.Http
                 callHandler(notFoundHandler_, new UrlParamsEmpty(), context);
                 return;
             }
+            
+            (new Cms.Benchmark.Scope()).Bench("myName", () =>
+            {
+                System.Console.WriteLine("What the heck");
+            });
+            (new Cms.Benchmark.Scope()).Bench("nothing", () =>
+            {
+            });
+            (new Cms.Benchmark.Scope()).Bench("myName2", () =>
+            {
+                for(int i = 0; i < 100; i++) 
+                {
+                    System.Console.WriteLine("What the heck");
+                }
+            });
+
 
             callHandler(handlerWithParameters.Key, handlerWithParameters.Value, context);
             return;
@@ -73,7 +89,7 @@ namespace Cms.Net.Http
 			}
 			catch(Exception e)
 			{
-				logger_.Error(string.Format("Exception: {0}", e.Message));
+				logger_.Error(string.Format("Exception: {0}, Source: {1}, StackTrace: {2}", e.Message, e.Source, e.StackTrace));
 			}
 			finally
 			{

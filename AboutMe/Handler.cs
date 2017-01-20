@@ -26,11 +26,8 @@ namespace AboutMe.Handler {
         public void ServeHttp(IResponseWriter response, IRequest request, IUrlParams urlParams)
         {
             var scoped = new Scope();
-            foreach (var expr in scoped.GetAll())
-            {
-                var report = expr.GetReport();
-                (new SimpleConsolePrinter()).Print(report);
-            }
+            Console.WriteLine("Found Scoped Benchs: {0}", scoped.GetAll().Count);
+            (new SimpleConsolePrinter()).Print(scoped.GetMeasurements());
             Environment.Exit(0);
         }
     }

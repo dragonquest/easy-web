@@ -87,6 +87,20 @@ namespace Cms.Benchmark
         {
             return _lab.GetAll();
         }
+
+        public List<Measurement> GetMeasurements()
+        {
+            var measurements = new List<Measurement>();
+
+            foreach (var expr in GetAll())
+            {
+                foreach(var m in expr.GetReport())
+                {
+                    measurements.Add(m);
+                }
+            }
+            return measurements;
+        }
     }
 
     public class Lab
@@ -151,14 +165,14 @@ namespace Cms.Benchmark
     public class Experiment
     {
         private Runner _runner;
-        private List<Runner.ReportEntry> _reports;
+        private List<Measurement> _measurements;
 
         private object _mu = new object();
 
         public Experiment()
         {
             _runner = new Runner();
-            _reports = new List<Runner.ReportEntry>();
+            _measurements = new List<Measurement>();
         }
 
         public void AddFunc(string name, Action func)
@@ -173,26 +187,26 @@ namespace Cms.Benchmark
         {
             lock(_mu)
             {
-                var newReports = _runner.Run(1);
+                List<Measurement> measurements = _runner.Run(1);
 
-                if (_reports.Count == 0)
+                if (_measurements.Count == 0)
                 {
-                    _reports = newReports;
+                    _measurements = measurements;
                     return;
                 }
 
-                for(int i = 0; i < _reports.Count; i++)
+                for(int i = 0; i < _measurements.Count; i++)
                 {
-                    _reports[i].Merge(newReports);
+                    _measurements[i].MergeList(measurements);
                 }
             }
         }
 
-        public List<Runner.ReportEntry> GetReport()
+        public List<Measurement> GetReport()
         {
             lock(_mu)
             {
-                return _reports;
+                return _measurements;
             }
         }
     }
