@@ -377,15 +377,15 @@ namespace Cms.Net.Http
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private string[] pop(int n, string[] values)
+        private string[] pop(int n, string[] values)
+        {
+            var popped = new string[values.Length - n];
+            int ptr = 0;
+            for(int i = n; i < values.Length; i++)
             {
-                var popped = new string[values.Length - n];
-                int ptr = 0;
-                for(int i = n; i < values.Length; i++)
-                {
-                    popped[ptr++] = values[i];
-                }
-                return popped;
+                popped[ptr++] = values[i];
             }
+            return popped;
+        }
     }
 }

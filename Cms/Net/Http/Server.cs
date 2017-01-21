@@ -54,22 +54,6 @@ namespace Cms.Net.Http
                 return;
             }
 
-            (new Cms.Benchmark.Scope()).Bench("myName", () =>
-                    {
-                    System.Console.WriteLine("What the heck");
-                    });
-            (new Cms.Benchmark.Scope()).Bench("nothing", () =>
-                    {
-                    });
-            (new Cms.Benchmark.Scope()).Bench("myName2", () =>
-                    {
-                    for(int i = 0; i < 100; i++) 
-                    {
-                    System.Console.WriteLine("What the heck");
-                    }
-                    });
-
-
             callHandler(handlerWithParameters.Key, handlerWithParameters.Value, context);
             return;
         }
@@ -81,7 +65,6 @@ namespace Cms.Net.Http
 
             _logger.Info(string.Format("{0} - {1} - {2} {3}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                         request.RemoteEndPoint.ToString(), request.HttpMethod, request.RawUrl));
-
 
             try
             {

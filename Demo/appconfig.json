@@ -1,0 +1,5 @@
+{
+	"template_base_dir": "./Demo/templates/",
+	"assets_base_dir": "./Demo/assets/",
+	"bind_address": "http://localhost:8000/"
+}

@@ -23,4 +23,23 @@ namespace Cms.Net.Http
             _func(response, request, urlParams);
         }
     }
+
+    public class HandlerFake : IHandler
+    {
+        private string _name;
+
+        public HandlerFake(string name)
+        {
+            _name = name;
+        }
+
+        public void ServeHttp(IResponseWriter response, IRequest request, IUrlParams urlParams)
+        {
+        }
+
+        public string GetName()
+        {
+            return _name;
+        }
+    }
 }
