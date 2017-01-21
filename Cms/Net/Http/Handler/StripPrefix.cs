@@ -10,27 +10,27 @@ namespace Cms.Net.Http.Handler
     // Path and invoking the passed IHandler.
     public class StripPrefix : IHandler
     {
-        private string prefix_;
-        private IHandler handler_;
+        private string _prefix;
+        private IHandler _handler;
 
         public StripPrefix(string prefix, IHandler handler)
         {
-            prefix_ = prefix;
-            handler_ = handler;
+            _prefix = prefix;
+            _handler = handler;
         }
 
-		public void ServeHttp(IResponseWriter response, IRequest request, IUrlParams urlParams)
-		{
-            if(!request.Url.AbsolutePath.StartsWith(prefix_))
+        public void ServeHttp(IResponseWriter response, IRequest request, IUrlParams urlParams)
+        {
+            if(!request.Url.AbsolutePath.StartsWith(_prefix))
             {
-                handler_.ServeHttp(response, request, urlParams);
+                _handler.ServeHttp(response, request, urlParams);
                 return;
             }
 
             var builder = new UriBuilder(request.Url);
-            builder.Path = request.Url.AbsolutePath.Substring(prefix_.Length);
+            builder.Path = request.Url.AbsolutePath.Substring(_prefix.Length);
             request.Url = builder.Uri;
-			handler_.ServeHttp(response, request, urlParams);
-		}
+            _handler.ServeHttp(response, request, urlParams);
+        }
     }
 }

@@ -40,12 +40,12 @@ namespace Cms.Net.Http
 
     class StaticRoute : IRoute, IRouteCreator
     {
-        protected IHandler handler_;
-        protected Dictionary<string, IRoute> children_;
+        protected IHandler _handler;
+        protected Dictionary<string, IRoute> _children;
 
         public StaticRoute()
         {
-            children_ = new Dictionary<string, IRoute>();
+            _children = new Dictionary<string, IRoute>();
         }
 
         public IRoute Create()
@@ -55,28 +55,28 @@ namespace Cms.Net.Http
 
         public IHandler GetData()
         {
-            return handler_;
+            return _handler;
         }
 
         public bool SetData(IHandler handler)
         {
-            handler_ = handler;
+            _handler = handler;
             return true;
         }
 
         public bool HasChild(string key)
         {
-            return children_.ContainsKey(key);
+            return _children.ContainsKey(key);
         }
 
         public RouteMatch TryMatch(string key)
         {
             var res = new RouteMatch();
             res.Stop = false;
-            res.IsMatch = children_.ContainsKey(key);
+            res.IsMatch = _children.ContainsKey(key);
             if (res.IsMatch)
             {
-                res.Route = children_[key];
+                res.Route = _children[key];
             }
 
             return res;
@@ -84,12 +84,12 @@ namespace Cms.Net.Http
 
         public IRoute GetChild(string key)
         {
-            return children_[key];
+            return _children[key];
         }
 
         public bool AddChild(string key, IRoute route)
         {
-            children_[key] = route;
+            _children[key] = route;
             return true;
         }
 
@@ -101,10 +101,10 @@ namespace Cms.Net.Http
                 padding += " ";
             }
             string pretty = "";
-            pretty += padding + "[data="+handler_+"]";
+            pretty += padding + "[data="+_handler+"]";
             pretty += "\n";
 
-            foreach (var item in children_)
+            foreach (var item in _children)
             {
                 pretty += padding + "Key: " + item.Key + "\n";
                 pretty += padding + "Data: " + item.Value.GetData() + "\n";
@@ -117,16 +117,16 @@ namespace Cms.Net.Http
 
     class RegexRoute : IRoute, IRouteCreator
     {
-        protected IHandler handler_;
-        protected Dictionary<string, IRoute> children_;
-		protected Dictionary<string, IRoute> regexChildren_;
-		protected ConcurrentDictionary<string, Regex> regexes_;
+        protected IHandler _handler;
+        protected Dictionary<string, IRoute> _children;
+        protected Dictionary<string, IRoute> _regexChildren;
+        protected ConcurrentDictionary<string, Regex> _regexes;
 
         public RegexRoute()
         {
-            children_ = new Dictionary<string, IRoute>();
-            regexChildren_ = new Dictionary<string, IRoute>();
-			regexes_ = new ConcurrentDictionary<string, Regex>();
+            _children = new Dictionary<string, IRoute>();
+            _regexChildren = new Dictionary<string, IRoute>();
+            _regexes = new ConcurrentDictionary<string, Regex>();
         }
 
         public IRoute Create()
@@ -136,19 +136,19 @@ namespace Cms.Net.Http
 
         public IHandler GetData()
         {
-            return handler_;
+            return _handler;
         }
 
         public bool SetData(IHandler handler)
         {
-            handler_ = handler;
+            _handler = handler;
             return true;
         }
 
         public bool HasChild(string key)
         {
-            return (children_.ContainsKey(key) ||
-				    regexChildren_.ContainsKey(key));
+            return (_children.ContainsKey(key) ||
+                    _regexChildren.ContainsKey(key));
         }
 
         public RouteMatch TryMatch(string key)
@@ -161,26 +161,26 @@ namespace Cms.Net.Http
             // If the route is not a regex and can be
             // found then we just go grab that route
             // before we execute any slow regex parsing:
-            if (children_.ContainsKey(key))
+            if (_children.ContainsKey(key))
             {
                 res.IsMatch = true;
-                res.Route = children_[key];
+                res.Route = _children[key];
                 return res;
             }
 
-            foreach (KeyValuePair<string, IRoute> child in regexChildren_)
+            foreach (KeyValuePair<string, IRoute> child in _regexChildren)
             {
                 Regex regex;
 
-				if (regexes_.ContainsKey(child.Key))
-				{
-					regex = regexes_[child.Key];
-				}
-				else
-				{
-					regex = new Regex(child.Key, RegexOptions.Compiled);
-					regexes_[child.Key] = regex;
-				}
+                if (_regexes.ContainsKey(child.Key))
+                {
+                    regex = _regexes[child.Key];
+                }
+                else
+                {
+                    regex = new Regex(child.Key, RegexOptions.Compiled);
+                    _regexes[child.Key] = regex;
+                }
 
                 var match = regex.Match(key);
                 if (match.Success)
@@ -206,23 +206,23 @@ namespace Cms.Net.Http
 
         public IRoute GetChild(string key)
         {
-			if (children_.ContainsKey(key))
-			{
-            	return children_[key];
-			}
+            if (_children.ContainsKey(key))
+            {
+                return _children[key];
+            }
 
-			return regexChildren_[key];
+            return _regexChildren[key];
         }
 
         public bool AddChild(string key, IRoute route)
         {
-			if (key.IndexOf('(') >= 0 && key.IndexOf(')') >= 0)
-			{
-				regexChildren_[key] = route;
-				return true;
-			}
+            if (key.IndexOf('(') >= 0 && key.IndexOf(')') >= 0)
+            {
+                _regexChildren[key] = route;
+                return true;
+            }
 
-            children_[key] = route;
+            _children[key] = route;
             return true;
         }
 
@@ -234,10 +234,10 @@ namespace Cms.Net.Http
                 padding += " ";
             }
             string pretty = "";
-            pretty += padding + "[data="+handler_+"]";
+            pretty += padding + "[data="+_handler+"]";
             pretty += "\n";
 
-            foreach (var item in children_)
+            foreach (var item in _children)
             {
                 pretty += padding + "Key: " + item.Key + "\n";
                 pretty += padding + "Data: " + item.Value.GetData() + "\n";
@@ -259,69 +259,69 @@ namespace Cms.Net.Http
     // cache & to benchmark the difference. DO NOT USE IT!
     class CachedSegmenter : ISegmenter
     {
-        private Dictionary<string, string[]> cache_;
-        private ISegmenter segmenter_;
+        private Dictionary<string, string[]> _cache;
+        private ISegmenter _segmenter;
 
-        private int size_;
-        
+        private int _size;
+
         public CachedSegmenter(ISegmenter segmenter, int size = 5000)
         {
-            cache_ = new Dictionary<string, string[]>();
-            segmenter_ = segmenter;
-            size_ = size;
+            _cache = new Dictionary<string, string[]>();
+            _segmenter = segmenter;
+            _size = size;
         }
 
         public string[] Split(string url)
         {
-            if(!cache_.ContainsKey(url))
+            if(!_cache.ContainsKey(url))
             {
-                if (cache_.Count >= size_) {
+                if (_cache.Count >= _size) {
                     Random rand = new Random();
-                    var itemKey = cache_.Keys.ToList()[rand.Next(0, cache_.Count)];
-                    cache_.Remove(itemKey);
+                    var itemKey = _cache.Keys.ToList()[rand.Next(0, _cache.Count)];
+                    _cache.Remove(itemKey);
                 }
 
-                var parsed = segmenter_.Split(url);
-                cache_[url] = parsed;
+                var parsed = _segmenter.Split(url);
+                _cache[url] = parsed;
                 return parsed;
             }
-            return cache_[url];
+            return _cache[url];
         }
     }
 
     class DelimiterSegmenter : ISegmenter
     {
-        private char delimiter_ = '/';
+        private char _delimiter = '/';
 
         public DelimiterSegmenter(char delimiter = '/')
         {
-           delimiter_ = delimiter;
+            _delimiter = delimiter;
         }
 
         public string[] Split(string url)
         {
-            return url.Split(delimiter_);
+            return url.Split(_delimiter);
         }
     }
 
     class Router
     {
-        protected IRoute root_;
-        protected ISegmenter segmenter_;
-        protected IRouteCreator routeCreator_;
+        protected IRoute _root;
+        protected ISegmenter _segmenter;
+        protected IRouteCreator _routeCreator;
 
         public Router(IRouteCreator routeCreator, ISegmenter segmenter)
         {
-            segmenter_ = segmenter;
-            routeCreator_ = routeCreator;
-            root_ = routeCreator.Create();
+            _segmenter = segmenter;
+            _routeCreator = routeCreator;
+            _root = routeCreator.Create();
         }
 
         public void Add(string url, IHandler handler)
         {
-            string[] segments = segmenter_.Split(url);
+            string[] segments = _segmenter.Split(url);
 
-            add(ref root_, segments, handler);
+            add(ref _root, segments, handler);
         }
 
         private void add(ref IRoute route, string[] segments, IHandler handler)
@@ -334,7 +334,7 @@ namespace Cms.Net.Http
 
             if (!route.HasChild(segments[0]))
             {
-                IRoute newRoute = routeCreator_.Create();
+                IRoute newRoute = _routeCreator.Create();
                 newRoute.SetData(handler);
                 route.AddChild(segments[0], newRoute);
             }
@@ -347,9 +347,9 @@ namespace Cms.Net.Http
         public KeyValuePair<IHandler, UrlParamsBag> Lookup(string url)
         {
             var parameters = new UrlParamsBag();
-            string[] segments = segmenter_.Split(url);
+            string[] segments = _segmenter.Split(url);
 
-            return lookup(ref root_, segments, ref parameters);
+            return lookup(ref _root, segments, ref parameters);
         }
 
         private KeyValuePair<IHandler, UrlParamsBag> lookup(ref IRoute route, string[] segments, ref UrlParamsBag parameters)
@@ -377,15 +377,15 @@ namespace Cms.Net.Http
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private string[] pop(int n, string[] values)
-        {
-            var popped = new string[values.Length - n];
-            int ptr = 0;
-            for(int i = n; i < values.Length; i++)
+            private string[] pop(int n, string[] values)
             {
-                popped[ptr++] = values[i];
+                var popped = new string[values.Length - n];
+                int ptr = 0;
+                for(int i = n; i < values.Length; i++)
+                {
+                    popped[ptr++] = values[i];
+                }
+                return popped;
             }
-            return popped;
-        }
     }
 }

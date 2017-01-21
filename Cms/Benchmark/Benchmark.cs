@@ -17,7 +17,7 @@ namespace Cms.Benchmark
         private List<Entry> _list;
         public Runner()
         {
-           _list = new List<Entry>();
+            _list = new List<Entry>();
         }
 
         public void AddFunc(string name, Action func)

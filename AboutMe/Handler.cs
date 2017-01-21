@@ -8,16 +8,16 @@ using Cms.Benchmark;
 namespace AboutMe.Handler {
     public class WebsiteController
     {
-        protected Cms.View.ITemplate template_;
+        protected Cms.View.ITemplate _template;
 
         public WebsiteController(Cms.View.ITemplate template)
         {
-            template_ = template;
+            _template = template;
         }
 
         public void IndexPage(IResponseWriter response, IRequest request, IUrlParams urlParams)
         {
-            response.WriteString(template_.Render("index.tmpl", null));
+            response.WriteString(_template.Render("index.tmpl", null));
         }
     }
 
@@ -42,18 +42,18 @@ namespace AboutMe.Handler {
 
     public class AssetsHandler : IHandler
     {
-        static readonly object locker_ = new object();
-        protected string assetsDir_;
+        static readonly object _locker = new object();
+        protected string _assetsDir;
 
         public AssetsHandler(string assetsDir)
         {
-            assetsDir_ = assetsDir;
+            _assetsDir = assetsDir;
         }
 
         public void ServeHttp(IResponseWriter response, IRequest request, IUrlParams urlParams)
         {
-            lock(locker_) {
-                string fileName = assetsDir_ + request.Url.AbsolutePath;
+            lock(_locker) {
+                string fileName = _assetsDir + request.Url.AbsolutePath;
                 response.Headers().Set("Cache-Control", "max-age=2592000"); // 30 days default
 
                 if (File.Exists(fileName))
@@ -66,7 +66,7 @@ namespace AboutMe.Handler {
                 }
 
                 response.WriteString("<html><head><meta charset=\"UTF-8\"></head><body><h1>File "+fileName+"</h1></body></html>");
-            } // lock(locker_)
+            } // lock(_locker)
         }
     }
 

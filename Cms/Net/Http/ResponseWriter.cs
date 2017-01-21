@@ -17,45 +17,45 @@ namespace Cms.Net.Http
         WebHeaderCollection Headers();
     }
 
-	class ResponseWriter : IResponseWriter
-	{
-		HttpListenerResponse response_;
+    class ResponseWriter : IResponseWriter
+    {
+        HttpListenerResponse _response;
 
-		public ResponseWriter(HttpListenerResponse response)
-		{
-			response_ = response;
-		}
+        public ResponseWriter(HttpListenerResponse response)
+        {
+            _response = response;
+        }
 
         public WebHeaderCollection Headers()
         {
-            return response_.Headers;
+            return _response.Headers;
         }
 
-		public void SetStatus(HttpStatusCode code)
-		{
-			response_.StatusCode = (int)code;
-		}
+        public void SetStatus(HttpStatusCode code)
+        {
+            _response.StatusCode = (int)code;
+        }
 
-		public void Redirect(string url)
-		{
-			response_.Redirect(url);
-			response_.Close();
-		}
+        public void Redirect(string url)
+        {
+            _response.Redirect(url);
+            _response.Close();
+        }
 
-		public void WriteString(string content)
-		{
-			byte[] buffer = System.Text.Encoding.UTF8.GetBytes(content);
-			Write(buffer);
-		}
+        public void WriteString(string content)
+        {
+            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(content);
+            Write(buffer);
+        }
 
-		public void Write(byte[] content)
-		{
-			response_.ContentLength64 = content.Length;
-			System.IO.Stream output = response_.OutputStream;
-			output.Write(content, 0, content.Length);
-			output.Close();
-			response_.Close();
-		}
+        public void Write(byte[] content)
+        {
+            _response.ContentLength64 = content.Length;
+            System.IO.Stream output = _response.OutputStream;
+            output.Write(content, 0, content.Length);
+            output.Close();
+            _response.Close();
+        }
 
         private void WriteGzip(byte[] content)
         {
@@ -67,14 +67,14 @@ namespace Cms.Net.Http
                 }
                 content = ms.ToArray();
             }
-            response_.AddHeader("Content-Encoding", "gzip");
-            response_.ContentLength64 = content.Length;
-            response_.OutputStream.Write(content, 0, content.Length);
+            _response.AddHeader("Content-Encoding", "gzip");
+            _response.ContentLength64 = content.Length;
+            _response.OutputStream.Write(content, 0, content.Length);
         }
 
         public HttpListenerResponse GetRawResponse()
         {
-            return response_;
+            return _response;
         }
-	}
+    }
 }

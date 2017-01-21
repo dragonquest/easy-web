@@ -4,50 +4,50 @@ using System.Threading;
 
 namespace Cms.View
 {
-  public interface ITemplate 
-  {
-    string Render(string name, object data);
-  }
-
-  public class Template : ITemplate
-  {
-    protected static ReaderWriterLock lock_ = new ReaderWriterLock();
-
-    protected Dictionary<string, string> files_;
-    protected Mustache.FormatCompiler compiler_;
-
-    public Template()
+    public interface ITemplate 
     {
-      files_ = new Dictionary<string, string>();
-      compiler_ = new Mustache.FormatCompiler();
+        string Render(string name, object data);
     }
 
-    public void LoadFromPath(string path)
+    public class Template : ITemplate
     {
-      string[] files = Directory.GetFiles(path, "*.tmpl", SearchOption.AllDirectories);
+        protected static ReaderWriterLock _lock = new ReaderWriterLock();
 
-      foreach (string file in files)
-      {
-        var name = file.Replace(path, "");
-        files_.Add(name, File.ReadAllText(file));
-      }
+        protected Dictionary<string, string> _files;
+        protected Mustache.FormatCompiler _compiler;
+
+        public Template()
+        {
+            _files = new Dictionary<string, string>();
+            _compiler = new Mustache.FormatCompiler();
+        }
+
+        public void LoadFromPath(string path)
+        {
+            string[] files = Directory.GetFiles(path, "*.tmpl", SearchOption.AllDirectories);
+
+            foreach (string file in files)
+            {
+                var name = file.Replace(path, "");
+                _files.Add(name, File.ReadAllText(file));
+            }
+        }
+
+        public string Render(string name, object data)
+        {
+            if(!_files.ContainsKey(name))
+            {
+                return "";
+            }
+
+            _lock.AcquireReaderLock(Timeout.Infinite);
+            try {
+                var content = _files[name];
+                Mustache.Generator generator = _compiler.Compile(content);
+                return generator.Render(data);
+            } finally {
+                _lock.ReleaseReaderLock();
+            }
+        }
     }
-
-    public string Render(string name, object data)
-    {
-      if(!files_.ContainsKey(name))
-      {
-        return "";
-      }
-
-      lock_.AcquireReaderLock(Timeout.Infinite);
-      try {
-        var content = files_[name];
-        Mustache.Generator generator = compiler_.Compile(content);
-        return generator.Render(data);
-      } finally {
-        lock_.ReleaseReaderLock();
-      }
-    }
-  }
 }

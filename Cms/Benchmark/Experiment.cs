@@ -6,47 +6,47 @@ using System.Threading.Tasks;
 namespace Cms.Benchmark
 {
     /*
-    public class Usage
-    {
-        public void Do()
-        {
-            int counter = 1;
+       public class Usage
+       {
+       public void Do()
+       {
+       int counter = 1;
 
-            var exp = new Experiment();
-            exp.AddFunc("for1", () => {
-                for(int i = 0; i < 1000; i++)
-                {
-                    counter += i * 2;
-                }
-            });
+       var exp = new Experiment();
+       exp.AddFunc("for1", () => {
+       for(int i = 0; i < 1000; i++)
+       {
+       counter += i * 2;
+       }
+       });
 
-            exp.AddFunc("for2", () => {
-                for(int i = 0; i < 1000; i++)
-                {
-                    counter += i - 2;
-                    counter /= 2;
-                }
-            });
+       exp.AddFunc("for2", () => {
+       for(int i = 0; i < 1000; i++)
+       {
+       counter += i - 2;
+       counter /= 2;
+       }
+       });
 
-            exp.AddFunc("for3", () => {
-                for(int i = 0; i < 1000; i++)
-                {
-                    counter += i * 2;
-                }
-            });
-            var lab = new Lab();
-            lab.Add("route lookup", exp);
-            lab.Run("route lookup");
-        }
+       exp.AddFunc("for3", () => {
+       for(int i = 0; i < 1000; i++)
+       {
+       counter += i * 2;
+       }
+       });
+       var lab = new Lab();
+       lab.Add("route lookup", exp);
+       lab.Run("route lookup");
+       }
 
-        public void Result()
-        {
-            var lab = new Lab();
-            var report = lab.Get("route lookup").GetReport();
-            (new SimpleConsolePrinter()).Print(report);
-        }
-    }
-    */
+       public void Result()
+       {
+       var lab = new Lab();
+       var report = lab.Get("route lookup").GetReport();
+       (new SimpleConsolePrinter()).Print(report);
+       }
+       }
+       */
 
     public class Scope
     {
@@ -72,10 +72,10 @@ namespace Cms.Benchmark
                 _lab.Add(name, expr);
             }
 
-           Task.Run(() =>
-           {
-             _lab.Run(name);
-           });
+            Task.Run(() =>
+                    {
+                    _lab.Run(name);
+                    });
         }
 
         public Experiment Get(string name)
@@ -155,7 +155,7 @@ namespace Cms.Benchmark
                 var exprs = new List<Experiment>();
                 foreach (var expr in _experiments)
                 {
-                   exprs.Add(expr.Value);
+                    exprs.Add(expr.Value);
                 }
                 return exprs;
             }

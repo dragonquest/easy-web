@@ -9,21 +9,21 @@ namespace Cms.Net.Http
         Uri Url { get; set; }
     }
 
-	class Request : IRequest
-	{
-		HttpListenerRequest request_;
+    class Request : IRequest
+    {
+        HttpListenerRequest _request;
 
         public Uri Url { get; set; }
 
-		public Request(HttpListenerRequest request)
-		{
-			request_ = request;
+        public Request(HttpListenerRequest request)
+        {
+            _request = request;
             Url = request.Url;
-		}
+        }
 
         public HttpListenerRequest GetRawRequest()
         {
-            return request_;
+            return _request;
         }
-	}
+    }
 }
