@@ -21,7 +21,7 @@ class Program
         }
         var config = ParseAppConfig(args[0]);
 
-        var tmpl = new Cms.View.TemplateEngine.MustacheTmpl();
+        var tmpl = new Cms.View.TemplateEngine.Razor();
         tmpl.LoadFromPath(config.TemplateBaseDir);
 
         var httpServer = new Server(new Cms.Log.Console());

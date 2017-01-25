@@ -36,7 +36,7 @@ namespace AboutMe.Handler {
                     }
                 });
             };
-            response.WriteString(_template.Render("index.tmpl", null));
+            response.WriteString(_template.Render("index.tmpl", new { Name = "Max" }));
         }
 
         public void BenchPage(IResponseWriter response, IRequest request, IUrlParams urlParams)
