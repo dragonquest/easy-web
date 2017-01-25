@@ -73,9 +73,9 @@ namespace Cms.Benchmark
             }
 
             Task.Run(() =>
-                    {
-                    _lab.Run(name);
-                    });
+            {
+                _lab.Run(name);
+            });
         }
 
         public Experiment Get(string name)

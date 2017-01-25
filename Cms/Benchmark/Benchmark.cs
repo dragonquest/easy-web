@@ -102,7 +102,7 @@ namespace Cms.Benchmark
         public double Average(Measurement m)
         {
             double res = 0;
-            foreach(var val in m.Values)
+            foreach (var val in m.Values)
             {
                 res += val;
             }
@@ -118,6 +118,17 @@ namespace Cms.Benchmark
                 return (sorted[mid] + sorted[mid -1]) / 2;
 
             return sorted[mid];
+        }
+
+        public double Min(Measurement m)
+        {
+            double res = Double.MaxValue;
+            foreach (var val in m.Values)
+            {
+                if (val < res) res = val;
+            }
+
+            return res; 
         }
     }
 
@@ -149,13 +160,15 @@ namespace Cms.Benchmark
             var stats = new Statistics();
             var grouped = GroupByName(measurements);
 
-            Console.WriteLine("Iters\t\tAvg\t\t\tMedian\t\t\t\tName");
+            Console.WriteLine("Iters\t\tAvg\t\t\tMedian\t\t\t\tMin\t\t\tName");
             foreach (var entry in grouped)
             {
                 var iters = entry.Value.Values.Count;
                 var avg = stats.Average(entry.Value);
                 var median = stats.Median(entry.Value);
-                Console.WriteLine("{0:0000}\t\t{1:00.00000} ms/avg\t\t{2:00.00000} ms/median\t\t{3}", iters, avg, median, entry.Key);
+                var min = stats.Min(entry.Value);
+
+                Console.WriteLine("{0:0000}\t\t{1:00.00000} ms/avg\t\t{2:00.00000} ms/median\t\t{3:00.00000} ms/min\t\t{4}", iters, avg, median, min, entry.Key);
             }
             Console.WriteLine(" ");
         }

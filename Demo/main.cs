@@ -31,7 +31,7 @@ class Program
         httpServer.Handle("/(?<name>[\\w]+).html$", new AboutMe.Handler.Website());
         httpServer.Handle("/assets/(?<file>.*)$", new StripPrefix("/assets/", new AboutMe.Handler.AssetsHandler(config.AssetsBaseDir)));
         httpServer.Handle("/", new HandlerFunc(websiteCtrl.IndexPage));
-        httpServer.Handle("/exit", new AboutMe.Handler.ExitApp());
+        httpServer.Handle("/bench", new HandlerFunc(websiteCtrl.BenchPage));
         httpServer.NotFound(new AboutMe.Handler.NotFound());
         httpServer.ListenAndServe(config.BindAddress);
     }

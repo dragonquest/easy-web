@@ -3,6 +3,7 @@ using System.Net;
 using System.IO;
 
 using Cms.Net.Http;
+
 using Cms.Benchmark;
 
 namespace AboutMe.Handler {
@@ -17,18 +18,31 @@ namespace AboutMe.Handler {
 
         public void IndexPage(IResponseWriter response, IRequest request, IUrlParams urlParams)
         {
+            for(int x=0;x < 1000;x++) {
+                (new Scope()).Bench("test1", () =>
+                {
+                    int res=0;
+                    for(int i=0; i<100;i++)
+                    {
+                        res += i;
+                    }
+                });
+                (new Scope()).Bench("test2", () =>
+                {
+                    int res=0;
+                    for(int i=0; i<100;i++)
+                    {
+                        res += (i * 2 * 3) - i;
+                    }
+                });
+            };
             response.WriteString(_template.Render("index.tmpl", null));
         }
-    }
 
-    public class ExitApp : IHandler
-    {
-        public void ServeHttp(IResponseWriter response, IRequest request, IUrlParams urlParams)
+        public void BenchPage(IResponseWriter response, IRequest request, IUrlParams urlParams)
         {
-            var scoped = new Scope();
-            Console.WriteLine("Found Scoped Benchs: {0}", scoped.GetAll().Count);
-            (new SimpleConsolePrinter()).Print(scoped.GetMeasurements());
-            Environment.Exit(0);
+            var report = (new Scope()).GetMeasurements();
+            (new SimpleConsolePrinter()).Print(report);
         }
     }
 
