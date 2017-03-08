@@ -1,0 +1,18 @@
+@Include("header.cshtml")
+        <!-- Page Heading -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">
+                    Recent Memes:
+                    <small>share and enjoy them!</small>
+                </h1>
+            </div>
+        </div>
+        <!-- /.row -->
+
+@foreach (var meme in Model.Memes)
+{
+  <img src="@Model.PublicPath@meme" />
+}
+
+@Include("footer.cshtml")

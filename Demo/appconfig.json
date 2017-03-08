@@ -1,5 +1,9 @@
 {
-	"template_base_dir": "./Demo/templates/",
+	"html_template_base_dir": "./Demo/templates/",
 	"assets_base_dir": "./Demo/assets/",
-	"bind_address": "http://localhost:8000/"
+	"bind_address": "http://localhost:8000/",
+
+  "meme_template_base_dir": "./Demo/assets/images/templates/",
+  "meme_storage_base_dir": "./Demo/assets/images/memes/",
+  "meme_web_path": "/assets/images/memes/"
 }

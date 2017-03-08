@@ -1,0 +1,29 @@
+@Include("header.cshtml")
+        <!-- Page Heading -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">
+                    Add Meme
+                    <small>Step 1: Select a template</small>
+                </h1>
+            </div>
+        </div>
+        <!-- /.row -->
+
+        <div class="row">
+            <div class="col-md-12">
+              Please select a template before you proceed. Click on the image.
+            </div>
+        </div>
+        <div class="row" style="margin-top:20px;">
+          <div class="col-md-12">
+            @foreach (var file in Model) {
+              <a href="create-meme?template=@file">
+                <img style="width: 220px;" src="/assets/images/templates/@file" />
+              </a>
+            }
+          </div>
+        </div>
+
+
+@Include("footer.cshtml")

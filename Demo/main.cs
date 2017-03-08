@@ -22,17 +22,25 @@ class Program
         var config = ParseAppConfig(args[0]);
 
         var tmpl = new Cms.View.TemplateEngine.Razor();
-        tmpl.LoadFromPath(config.TemplateBaseDir);
+        tmpl.LoadFromPath(config.HtmlTemplateBaseDir);
+
+        var memeStorage = new Storage.MemeFileStorage(config.MemeStorageBaseDir);
+
+        var memeTemplateStorage = new Storage.MemeTemplate();
+        memeTemplateStorage.Load(config.MemeTemplateBaseDir);
 
         var httpServer = new Server(new Cms.Log.Console());
 
-        var websiteCtrl = new AboutMe.Handler.WebsiteController(tmpl);
+        var memeCtrl = new Controller.MemeGen(tmpl, memeTemplateStorage, memeStorage, config.MemeWebPath);
+        var assetsServer = new Controller.AssetsServer(config.AssetsBaseDir);
 
-        httpServer.Handle("/(?<name>[\\w]+).html$", new AboutMe.Handler.Website());
-        httpServer.Handle("/assets/(?<file>.*)$", new StripPrefix("/assets/", new AboutMe.Handler.AssetsHandler(config.AssetsBaseDir)));
-        httpServer.Handle("/", new HandlerFunc(websiteCtrl.IndexPage));
-        httpServer.Handle("/bench", new HandlerFunc(websiteCtrl.BenchPage));
-        httpServer.NotFound(new AboutMe.Handler.NotFound());
+        httpServer.Handle("/assets/(?<file>.*)$", new StripPrefix("/assets/", assetsServer));
+        httpServer.Handle("/", new HandlerFunc(memeCtrl.IndexPage));
+        httpServer.Handle("/select-template", new HandlerFunc(memeCtrl.SelectTemplatePage));
+        httpServer.Handle("/create-meme", new HandlerFunc(memeCtrl.CreateMemePage));
+        httpServer.Handle("/save-meme", new HandlerFunc(memeCtrl.SaveMemePage));
+        httpServer.NotFound(new Controller.NotFound());
+
         httpServer.ListenAndServe(config.BindAddress);
     }
 
@@ -54,7 +62,10 @@ class Program
 [DataContract]
 class AppConfig
 {
-    [DataMember(Name="template_base_dir")] public string TemplateBaseDir { get; set; }
+    [DataMember(Name="html_template_base_dir")] public string HtmlTemplateBaseDir { get; set; }
     [DataMember(Name="assets_base_dir")] public string AssetsBaseDir { get; set; }
     [DataMember(Name="bind_address")] public string BindAddress { get; set; }
+    [DataMember(Name="meme_template_base_dir")] public string MemeTemplateBaseDir { get; set; }
+    [DataMember(Name="meme_storage_base_dir")] public string MemeStorageBaseDir { get; set; }
+    [DataMember(Name="meme_web_path")] public string MemeWebPath { get; set; }
 }

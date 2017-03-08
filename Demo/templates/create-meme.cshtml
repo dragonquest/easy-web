@@ -1,0 +1,55 @@
+@Include("header.cshtml")
+
+        <!-- Page Heading -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">
+                    Add Meme
+                    <small>Step 2: Create your meme</small>
+                </h1>
+            </div>
+        </div>
+        <!-- /.row -->
+
+        <div class="row" style="margin-top:20px;">
+          <div class="col-md-12">
+
+              <img src="./assets/images/templates/@Model.template" id="meme">
+              <br />
+              <button type="button" class="btn btn-primary" id="save">Save meme</button>
+              <br /><br /><br />
+              <div id="preview"></div>
+              <br /><br /><br /><br /><br />
+
+            </div>
+            <!-- /.container -->
+          </div>
+        </div>
+
+
+    <script>
+      $(document).ready(function(){
+          $("#meme").memeGenerator();
+      
+          $("#save").click(function(e){
+              e.preventDefault();
+
+              var imageDataUrl = $("#meme").memeGenerator("save");
+
+              $.ajax({
+                  url: "/save-meme",
+                  type: "POST",
+                  data: {image: imageDataUrl},
+                  dataType: "json",
+                  success: function(response){
+                      $("#preview").html(
+                          $("<img>").attr("src", response.filename)
+                      );
+                  }
+              });
+            });
+
+      });
+    </script>
+
+@Include("footer.cshtml")
