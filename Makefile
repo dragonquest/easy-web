@@ -1,6 +1,6 @@
 SRCS = $(shell find . -name '*.cs' -and -not -name '*test*')
 SRCS_TESTS = $(shell find . -name '*.cs')
-DEPS = -r:System.Net.Http -r:System.Web -r:System.Runtime.Serialization -r:mustache-sharp.dll -r:RazorEngine.dll -r:System.Web.Razor.dll
+DEPS = -r:System.Net.Http -r:System.Web -r:System.Web.Extensions -r:System.Runtime.Serialization -r:mustache-sharp.dll -r:RazorEngine.dll -r:System.Web.Razor.dll
 
 # Dependencies sources
 # mustache: https://github.com/jehugaleahsa/mustache-sharp
@@ -23,6 +23,5 @@ clean:
 
 lib:
 	mcs /out:Cms.dll -target:library $(DEPS) $(SRCS)
-
 
 .PHONY: clean

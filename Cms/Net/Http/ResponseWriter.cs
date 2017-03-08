@@ -4,12 +4,15 @@ using System.Net;
 using System.IO;
 using System.IO.Compression;
 
+using System.Web.Script.Serialization;
+
 namespace Cms.Net.Http
 {
     public interface IResponseWriter
     {
         void SetStatus(HttpStatusCode code);
         void Redirect(string url);
+        void WriteJson(object obj);
         void WriteString(string content);
         void Write(byte[] content);
 
@@ -40,6 +43,12 @@ namespace Cms.Net.Http
         {
             _response.Redirect(url);
             _response.Close();
+        }
+
+        public void WriteJson(object data)
+        {
+            var json = new JavaScriptSerializer().Serialize(data);
+            WriteString(json);
         }
 
         public void WriteString(string content)

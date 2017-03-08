@@ -17,9 +17,9 @@ namespace Cms.View.TemplateEngine
             _service = Engine.Razor;
         }
 
-        public void LoadFromPath(string path)
+        public void LoadFromPath(string path, string extension = "*.cshtml")
         {
-            string[] files = Directory.GetFiles(path, "*.tmpl", SearchOption.AllDirectories);
+            string[] files = Directory.GetFiles(path, extension, SearchOption.AllDirectories);
 
             var templates = new List<string>();
             foreach (string file in files)
@@ -32,6 +32,7 @@ namespace Cms.View.TemplateEngine
             foreach (string name in templates)
             {
                 _service.Compile(name);
+                Console.WriteLine("Compiled {0}", name);
             }
         }
 
