@@ -24,4 +24,7 @@ clean:
 lib:
 	mcs /out:Cms.dll -target:library $(DEPS) $(SRCS)
 
+rundemo: build
+	mono --debug ./Demo/main.exe ./Demo/appconfig.json
+
 .PHONY: clean
