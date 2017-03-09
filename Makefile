@@ -1,16 +1,14 @@
-SRCS = $(shell find . -name '*.cs' -and -not -name '*test*')
+SRCS = $(shell find . -name '*.cs' -and -not -name '*test*' -and -not -path './Demo/*')
 SRCS_TESTS = $(shell find . -name '*.cs')
-DEPS = -r:System.Net.Http -r:System.Web -r:System.Web.Extensions -r:System.Runtime.Serialization -r:mustache-sharp.dll -r:RazorEngine.dll -r:System.Web.Razor.dll
+DEPS = -r:System.Net.Http -r:System.Web -r:System.Web.Extensions -r:System.Runtime.Serialization -r:ThirdParty/mustache-sharp.dll -r:ThirdParty/RazorEngine.dll -r:ThirdParty/System.Web.Razor.dll
 
 # Dependencies sources
 # mustache: https://github.com/jehugaleahsa/mustache-sharp
 # RazorEngine: https://github.com/Antaris/RazorEngine
 
-build:
-	mcs /out:Demo/main.exe -o- -debug $(DEPS) $(SRCS)
-
-prod:
-	mcs /out:Demo/main.exe -o+ $(DEPS) $(SRCS)
+lib:
+	mcs /out:Demo/ThirdParty/Cms.dll -target:library $(DEPS) $(SRCS)
+	cp -rf ThirdParty Demo/ThirdParty
 
 test:
 	mcs /out:tests.dll -target:library -r:nunit.framework.dll $(DEPS) $(SRCS_TESTS)
@@ -20,11 +18,5 @@ test:
 
 clean:
 	rm Demo/main.exe
-
-lib:
-	mcs /out:Cms.dll -target:library $(DEPS) $(SRCS)
-
-rundemo: build
-	mono --debug ./Demo/main.exe ./Demo/appconfig.json
 
 .PHONY: clean

@@ -7,12 +7,12 @@ using System.Linq;
 
 namespace Cms.Net.Http
 {
-    interface IRouteCreator
+    public interface IRouteCreator
     {
         IRoute Create();
     }
 
-    struct RouteMatch
+    public struct RouteMatch
     {
         public bool IsMatch;
         public IRoute Route;
@@ -24,7 +24,7 @@ namespace Cms.Net.Http
         public bool Stop;
     }
 
-    interface IRoute
+    public interface IRoute
     {
         IHandler GetData();
         bool SetData(IHandler data);
@@ -38,7 +38,7 @@ namespace Cms.Net.Http
         string Dump(int level = 0);
     }
 
-    class StaticRoute : IRoute, IRouteCreator
+    public class StaticRoute : IRoute, IRouteCreator
     {
         protected IHandler _handler;
         protected Dictionary<string, IRoute> _children;
@@ -115,7 +115,7 @@ namespace Cms.Net.Http
         }
     }
 
-    class RegexRoute : IRoute, IRouteCreator
+    public class RegexRoute : IRoute, IRouteCreator
     {
         protected IHandler _handler;
         protected Dictionary<string, IRoute> _children;
@@ -248,7 +248,7 @@ namespace Cms.Net.Http
         }
     }
 
-    interface ISegmenter
+    public interface ISegmenter
     {
         string[] Split(string url);
     }
@@ -257,7 +257,7 @@ namespace Cms.Net.Http
     // CAUTION: A brute force lookupper could blow the
     // Cache. This was just a sample impl test of a stupid
     // cache & to benchmark the difference. DO NOT USE IT!
-    class CachedSegmenter : ISegmenter
+    public class CachedSegmenter : ISegmenter
     {
         private Dictionary<string, string[]> _cache;
         private ISegmenter _segmenter;
@@ -289,7 +289,7 @@ namespace Cms.Net.Http
         }
     }
 
-    class DelimiterSegmenter : ISegmenter
+    public class DelimiterSegmenter : ISegmenter
     {
         private char _delimiter = '/';
 
@@ -304,7 +304,7 @@ namespace Cms.Net.Http
         }
     }
 
-    class Router
+    public class Router
     {
         protected IRoute _root;
         protected ISegmenter _segmenter;

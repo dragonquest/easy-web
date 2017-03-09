@@ -8,7 +8,7 @@ namespace Cms.Net.Http
         string Get(string key);
     }
 
-    class UrlParamsEmpty : IUrlParams
+    public class UrlParamsEmpty : IUrlParams
     {
         public string Get(string key)
         {
@@ -16,7 +16,7 @@ namespace Cms.Net.Http
         }
     }
 
-    class UrlParamsBag : IUrlParams
+    public class UrlParamsBag : IUrlParams
     {
         protected Dictionary<string, string> _params;
 

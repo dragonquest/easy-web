@@ -10,7 +10,7 @@ using Cms.Log;
 
 namespace Cms.Net.Http
 {
-    class Server
+    public class Server
     {
         protected Router _router;
         protected IHandler _notFoundHandler;

@@ -7,7 +7,7 @@ using Cms.Net.Http;
 
 namespace Cms.Net.Http.Form
 {
-    class PostParser
+    public class PostParser
     {
         public static NameValueCollection Parse(IRequest req)
         {
