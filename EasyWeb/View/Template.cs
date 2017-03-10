@@ -1,4 +1,4 @@
-namespace Cms.View
+namespace EasyWeb.View
 {
     public interface ITemplate
     {

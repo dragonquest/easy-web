@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
-namespace Cms.Benchmark
+namespace EasyWeb.Benchmark
 {
     /*
        public class Usage

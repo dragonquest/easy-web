@@ -2,7 +2,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Cms.View.TemplateEngine
+namespace EasyWeb.View.TemplateEngine
 {
     // XXX: MustacheTmpl is called with the prefix Tmpl
     //      because it would conflict with the dependency namespace Mustache.

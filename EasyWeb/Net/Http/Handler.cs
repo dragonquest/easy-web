@@ -1,7 +1,7 @@
 using System;
 using System.Net;
 
-namespace Cms.Net.Http
+namespace EasyWeb.Net.Http
 {
     public interface IHandler
     {

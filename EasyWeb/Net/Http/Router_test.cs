@@ -1,6 +1,6 @@
 using NUnit.Framework;
 
-using Cms.Net.Http;
+using EasyWeb.Net.Http;
 
 [TestFixture]
 public class RouterTest

@@ -3,9 +3,9 @@ using System.Net;
 using System.Web;
 using System.Collections.Specialized;
 
-using Cms.Net.Http;
+using EasyWeb.Net.Http;
 
-namespace Cms.Net.Http.Form
+namespace EasyWeb.Net.Http.Form
 {
     public class PostParser
     {

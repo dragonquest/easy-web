@@ -6,9 +6,9 @@ using System.Text.RegularExpressions;
 
 using System.Net;
 
-using Cms.Log;
+using EasyWeb.Log;
 
-namespace Cms.Net.Http
+namespace EasyWeb.Net.Http
 {
     public class Server
     {

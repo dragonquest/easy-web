@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Cms.Log
+namespace EasyWeb.Log
 {
     // Simple Logging interface without context data
     // since its sufficient for this little project.

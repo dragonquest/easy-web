@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Cms.Net.Http
+namespace EasyWeb.Net.Http
 {
     public interface IUrlParams
     {

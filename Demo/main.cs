@@ -5,8 +5,8 @@ using System.IO; // FileServer
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 
-using Cms.Net.Http;
-using Cms.Net.Http.Handler;
+using EasyWeb.Net.Http;
+using EasyWeb.Net.Http.Handler;
 
 using System.Threading;
 
@@ -21,7 +21,7 @@ class Program
         }
         var config = ParseAppConfig(args[0]);
 
-        var tmpl = new Cms.View.TemplateEngine.Razor();
+        var tmpl = new EasyWeb.View.TemplateEngine.Razor();
         tmpl.LoadFromPath(config.HtmlTemplateBaseDir);
 
         var memeStorage = new Storage.MemeFileStorage(config.MemeStorageBaseDir);
@@ -29,7 +29,7 @@ class Program
         var memeTemplateStorage = new Storage.MemeTemplate();
         memeTemplateStorage.Load(config.MemeTemplateBaseDir);
 
-        var httpServer = new Server(new Cms.Log.Console());
+        var httpServer = new Server(new EasyWeb.Log.Console());
 
         var memeCtrl = new Controller.MemeGen(tmpl, memeTemplateStorage, memeStorage, config.MemeWebPath);
         var assetsServer = new Controller.AssetsServer(config.AssetsBaseDir);

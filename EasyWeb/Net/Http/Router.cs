@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using System.Runtime.CompilerServices;
 using System.Linq;
 
-namespace Cms.Net.Http
+namespace EasyWeb.Net.Http
 {
     public interface IRouteCreator
     {

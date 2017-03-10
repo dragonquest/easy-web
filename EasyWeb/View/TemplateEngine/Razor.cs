@@ -6,7 +6,7 @@ using System.Threading;
 using RazorEngine;
 using RazorEngine.Templating;
 
-namespace Cms.View.TemplateEngine
+namespace EasyWeb.View.TemplateEngine
 {
     public class Razor : ITemplate
     {

@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Collections.Generic;
 
@@ -39,7 +40,13 @@ namespace Storage
 
             foreach (var file in files)
             {
-                memes.Add(Path.GetFileName(file));
+                var filename = Path.GetFileName(file);
+                if (filename.StartsWith(".", StringComparison.CurrentCulture))
+                {
+                    continue;
+                }
+
+                memes.Add(filename);
             }
 
             return memes;

@@ -1,9 +1,9 @@
 using System;
 using System.Net;
 
-using Cms.Net.Http;
+using EasyWeb.Net.Http;
 
-namespace Cms.Net.Http.Handler
+namespace EasyWeb.Net.Http.Handler
 {
     // StripPrefix returns a IHandler that serves 
     // HTTP requests by removing a given prefix from the request URL's

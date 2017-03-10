@@ -6,7 +6,7 @@ using System.IO.Compression;
 
 using System.Web.Script.Serialization;
 
-namespace Cms.Net.Http
+namespace EasyWeb.Net.Http
 {
     public interface IResponseWriter
     {

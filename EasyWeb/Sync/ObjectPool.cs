@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Cms.Sync
+namespace EasyWeb.Sync
 {
     // Pool is a set of temporary objects that may be saved and fetched.
     // The purpose is to cache allocated but unused items in order to reuse them later. 

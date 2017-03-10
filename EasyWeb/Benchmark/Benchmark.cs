@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace Cms.Benchmark
+namespace EasyWeb.Benchmark
 {
     // Entry defines a Benchmark Action
     public struct Entry

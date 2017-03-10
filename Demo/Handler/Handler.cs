@@ -5,8 +5,8 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Linq;
 
-using Cms.Net.Http;
-using Cms.Net.Http.Form;
+using EasyWeb.Net.Http;
+using EasyWeb.Net.Http.Form;
 
 using System.Web;
 
@@ -16,12 +16,12 @@ namespace Controller {
 
 	public class MemeGen
 	{
-		private Cms.View.ITemplate _template;
+		private EasyWeb.View.ITemplate _template;
 		private Storage.MemeTemplate _memeTemplates;
 		private Storage.MemeFileStorage _meme;
         private string _memeWebPath;
 
-		public MemeGen(Cms.View.ITemplate template, Storage.MemeTemplate memeTemplates, Storage.MemeFileStorage meme, string memeWebPath)
+		public MemeGen(EasyWeb.View.ITemplate template, Storage.MemeTemplate memeTemplates, Storage.MemeFileStorage meme, string memeWebPath)
 		{
 			_template = template;
 			_memeTemplates = memeTemplates;

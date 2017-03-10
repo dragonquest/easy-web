@@ -7,7 +7,7 @@ DEPS = -r:System.Net.Http -r:System.Web -r:System.Web.Extensions -r:System.Runti
 # RazorEngine: https://github.com/Antaris/RazorEngine
 
 lib:
-	mcs /out:Demo/ThirdParty/Cms.dll -target:library $(DEPS) $(SRCS)
+	mcs /out:Demo/ThirdParty/EasyWeb.dll -target:library $(DEPS) $(SRCS)
 	cp -rf ThirdParty Demo/ThirdParty
 
 test:
@@ -15,8 +15,5 @@ test:
 	nunit-console -nologo tests.dll
 	rm TestResult.xml
 	rm tests.dll
-
-clean:
-	rm Demo/main.exe
 
 .PHONY: clean
