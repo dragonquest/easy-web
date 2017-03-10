@@ -1,14 +1,12 @@
 using System;
 using System.Net;
 
-using System.IO; // FileServer
+using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 
 using EasyWeb.Net.Http;
 using EasyWeb.Net.Http.Handler;
-
-using System.Threading;
 
 class Program
 {
