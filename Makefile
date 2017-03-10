@@ -8,7 +8,7 @@ DEPS = -r:System.Net.Http -r:System.Web -r:System.Web.Extensions -r:System.Runti
 
 lib:
 	mcs /out:Demo/ThirdParty/EasyWeb.dll -target:library $(DEPS) $(SRCS)
-	cp -rf ThirdParty Demo/ThirdParty
+	cp -rf ThirdParty/* Demo/ThirdParty/
 
 test:
 	mcs /out:tests.dll -target:library -r:nunit.framework.dll $(DEPS) $(SRCS_TESTS)
